@@ -73,14 +73,12 @@ async function createCheckout({
     cancel_url: cancelUrl,
     fail_url: failUrl,
     customer: {
-      name: customer.name,
-      email: customer.email,
-      phone: customer.phone,
-      address: customer.address,
-      city: customer.city,
-      postcode: customer.postcode,
-      country: customer.country || "Bangladesh",
-    },
+  name: customer.name,
+  email: customer.email,
+  phone: customer.phone,
+  city: customer.city,
+  country: customer.country || "Bangladesh",
+},
   };
 
   if (ipnUrl) {
