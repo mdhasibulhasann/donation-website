@@ -329,15 +329,22 @@ form.addEventListener("submit", async (event) => {
 
     if (!response.ok || !data.success) {
 
-      showStatus(
-        data?.error ||
-        "Unable to start payment. Please try again."
-      );
+  let errorMessage = data?.error;
 
-      setLoading(false);
+  if (!errorMessage && data?.errors) {
+    errorMessage = Object.values(data.errors).join(" ");
+  }
 
-      return;
-    }
+  showStatus(
+    errorMessage ||
+    "Unable to start payment. Please try again."
+  );
+
+  console.error("Backend payment error:", data);
+
+  setLoading(false);
+  return;
+}
 
 
     if (!data.checkoutUrl) {
