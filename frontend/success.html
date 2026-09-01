@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verifying your donation…</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <main class="page">
+    <div class="result-card" id="resultCard">
+
+      <div class="result-status" id="verifyingStatus">
+        <span class="dot" aria-hidden="true"></span>
+        <span>Verifying your donation with Moneybag…</span>
+      </div>
+
+      <div id="resultContent" hidden>
+        <div class="result-icon" id="resultIcon"></div>
+        <h1 class="result-title" id="resultTitle"></h1>
+        <p class="result-message" id="resultMessage"></p>
+
+        <div class="result-details" id="resultDetails">
+          <div class="result-details__row">
+            <span class="result-details__label">Amount</span>
+            <span class="result-details__value" id="detailAmount">—</span>
+          </div>
+          <div class="result-details__row">
+            <span class="result-details__label">Transaction ID</span>
+            <span class="result-details__value" id="detailTransactionId">—</span>
+          </div>
+          <div class="result-details__row">
+            <span class="result-details__label">Status</span>
+            <span class="result-details__value" id="detailStatus">—</span>
+          </div>
+        </div>
+
+        <a href="index.html" class="back-btn">Back to Donation</a>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="success.js"></script>
+</body>
+</html>
