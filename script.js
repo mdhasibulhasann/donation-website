@@ -10,7 +10,7 @@
 // Point this at your backend. In local development that's
 // http://localhost:5000; after deployment, change it to your deployed
 // backend's public HTTPS URL (see README "Deployment").
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = "https://donation-website-7qgp.onrender.com";
 
 const MIN_AMOUNT = 10;
 const MAX_AMOUNT = 1000000;
