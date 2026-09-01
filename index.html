@@ -1,380 +1,372 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Donate Here</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="style.css?v=10" />
+<title>Donate Here</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
 </head>
+
 
 <body>
 
+
 <main class="page">
 
-  <section class="checkout">
-
-    <aside class="hero-panel">
-
-      <div class="hero-top">
-        <div class="logo-mark">
-          ♡
-        </div>
-
-        <span class="hero-badge">SECURE DONATION</span>
-      </div>
-
-      <div class="hero-content">
-        <p class="eyebrow">MAKE A DIFFERENCE</p>
-
-        <h1>
-          Small gift.
-          <span>Real impact.</span>
-        </h1>
-
-        <p class="hero-text">
-          Your contribution can help create something meaningful.
-          Choose an amount and complete your secure donation.
-        </p>
-      </div>
-
-      <div class="trust-card">
-        <div class="trust-icon">⌁</div>
-
-        <div>
-          <strong>Safe & secure checkout</strong>
-          <span>Payment processed by Moneybag</span>
-        </div>
-      </div>
-
-    </aside>
-
-
-    <section class="form-panel">
-
-      <div class="form-heading">
-
-        <div>
-          <span class="form-kicker">DONATION</span>
-          <h2>Donate Here</h2>
-          <p>Complete your donation in a few seconds.</p>
-        </div>
-
-        <div class="form-icon">
-          ♡
-        </div>
-
-      </div>
-
-
-      <form id="donationForm" novalidate>
-
-        <div class="section-block">
-
-          <div class="section-title-row">
-            <span class="section-title">Choose amount</span>
-            <span class="currency-label">BDT</span>
-          </div>
 
+<section class="donation-wrapper">
 
-          <div
-            class="amount-grid"
-            id="amountGrid"
-            role="radiogroup"
-            aria-label="Donation amount"
-          >
 
-            <button
-              class="amount-btn"
-              type="button"
-              data-amount="10"
-              role="radio"
-              aria-checked="false"
-            >
-              ৳10
-            </button>
+<!-- LEFT SIDE -->
 
-            <button
-              class="amount-btn"
-              type="button"
-              data-amount="20"
-              role="radio"
-              aria-checked="false"
-            >
-              ৳20
-            </button>
+<div class="left-panel">
 
-            <button
-              class="amount-btn"
-              type="button"
-              data-amount="50"
-              role="radio"
-              aria-checked="false"
-            >
-              ৳50
-            </button>
 
-            <button
-              class="amount-btn"
-              type="button"
-              data-amount="custom"
-              role="radio"
-              aria-checked="false"
-            >
-              Custom
-            </button>
+<div class="logo">
+❤️
+</div>
 
-          </div>
 
+<div class="left-content">
 
-          <div
-            class="custom-amount"
-            id="customAmountWrap"
-            hidden
-          >
+<span class="tag">
+MAKE AN IMPACT
+</span>
 
-            <span>৳</span>
 
-            <input
-              id="customAmount"
-              name="customAmount"
-              type="number"
-              min="10"
-              max="1000000"
-              step="1"
-              inputmode="decimal"
-              placeholder="Enter amount"
-            >
+<h1>
+Your kindness
+<br>
+creates change.
+</h1>
 
-          </div>
 
+<p>
+Every contribution matters.
+Your small donation can help
+create something meaningful
+for people who need it.
+</p>
 
-          <p
-            class="error-text"
-            id="amountError"
-            hidden
-          ></p>
 
+<div class="features">
 
-          <div
-            class="amount-summary"
-            id="amountPreview"
-            hidden
-          >
+<div>
+<span>✓</span>
+Secure Payment
+</div>
 
-            <span>Your donation</span>
 
-            <strong id="amountPreviewValue">
-              ৳0
-            </strong>
+<div>
+<span>✓</span>
+Moneybag Protected
+</div>
 
-          </div>
 
-        </div>
+<div>
+<span>✓</span>
+Fast & Easy Checkout
+</div>
 
-
-        <div class="soft-divider"></div>
-
-
-        <div class="section-block">
-
-          <span class="section-title">
-            Your information
-          </span>
-
-
-          <div class="form-grid">
-
-            <label class="field field-full">
-
-              <span>Full name</span>
-
-              <input
-                type="text"
-                id="fullName"
-                name="fullName"
-                autocomplete="name"
-                placeholder="Enter your full name"
-                required
-              >
-
-              <small
-                class="error-text"
-                data-error-for="fullName"
-                hidden
-              ></small>
-
-            </label>
-
-
-            <label class="field">
-
-              <span>Email</span>
-
-              <input
-                type="email"
-                id="email"
-                name="email"
-                autocomplete="email"
-                placeholder="name@example.com"
-                required
-              >
-
-              <small
-                class="error-text"
-                data-error-for="email"
-                hidden
-              ></small>
-
-            </label>
-
-
-            <label class="field">
-
-              <span>Phone number</span>
-
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                autocomplete="tel"
-                placeholder="017XXXXXXXX"
-                required
-              >
-
-              <small
-                class="error-text"
-                data-error-for="phone"
-                hidden
-              ></small>
-
-            </label>
-
-
-            <label class="field">
-
-              <span>City</span>
-
-              <input
-                type="text"
-                id="city"
-                name="city"
-                autocomplete="address-level2"
-                placeholder="Dhaka"
-                required
-              >
-
-              <small
-                class="error-text"
-                data-error-for="city"
-                hidden
-              ></small>
-
-            </label>
-
-
-            <label class="field">
-
-              <span>Country</span>
-
-              <input
-                type="text"
-                id="country"
-                name="country"
-                value="Bangladesh"
-                readonly
-              >
-
-            </label>
-
-          </div>
-
-        </div>
-
-
-        <p
-          class="form-status"
-          id="formStatus"
-          role="status"
-          aria-live="polite"
-          hidden
-        ></p>
-
-
-        <button
-          class="submit-btn"
-          id="submitBtn"
-          type="submit"
-        >
-
-          <span class="submit-btn__icon">
-            🔒
-          </span>
-
-          <span class="submit-btn__label">
-            Proceed to Payment
-          </span>
-
-          <span
-            class="submit-btn__spinner"
-            aria-hidden="true"
-          ></span>
-
-        </button>
-
-        <div class="trust-grid">
-
-  <div class="mini-trust-card">
-    <div class="mini-trust-icon">🔒</div>
-    <div>
-      <strong>Secure Payment</strong>
-      <span>Your transaction is protected.</span>
-    </div>
-  </div>
-
-  <div class="mini-trust-card">
-    <div class="mini-trust-icon">⚡</div>
-    <div>
-      <strong>Fast Checkout</strong>
-      <span>Complete your donation quickly.</span>
-    </div>
-  </div>
-
-  <div class="mini-trust-card">
-    <div class="mini-trust-icon">✓</div>
-    <div>
-      <strong>Privacy Protected</strong>
-      <span>Your information stays secure.</span>
-    </div>
-  </div>
 
 </div>
 
 
-        <div class="payment-footer">
+</div>
 
-          <span class="shield">✓</span>
 
-          <span>
-            Encrypted and securely processed by Moneybag
-          </span>
+<div class="curve circle-one"></div>
+<div class="curve circle-two"></div>
 
-        </div>
 
-      </form>
+</div>
 
-    </section>
 
-  </section>
+
+
+
+<!-- RIGHT SIDE -->
+
+
+<div class="right-panel">
+
+
+<div class="heading">
+
+<span>
+DONATION
+</span>
+
+<h2>
+Donate Here
+</h2>
+
+<p>
+Complete your donation securely
+</p>
+
+
+</div>
+
+
+
+
+<form id="donationForm">
+
+
+
+<div class="amount-section">
+
+
+<label>
+Choose Amount
+</label>
+
+
+<div class="amount-grid" id="amountGrid">
+
+
+<button 
+type="button"
+class="amount-btn"
+data-amount="10">
+৳10
+</button>
+
+
+<button
+type="button"
+class="amount-btn"
+data-amount="20">
+৳20
+</button>
+
+
+<button
+type="button"
+class="amount-btn"
+data-amount="50">
+৳50
+</button>
+
+
+<button
+type="button"
+class="amount-btn"
+data-amount="custom">
+Custom
+</button>
+
+
+</div>
+
+
+
+<div 
+class="custom-box"
+id="customAmountWrap"
+hidden>
+
+
+<span>
+৳
+</span>
+
+
+<input
+id="customAmount"
+type="number"
+placeholder="Enter amount">
+
+
+</div>
+
+
+<p id="amountError" class="error"></p>
+
+
+<div
+id="amountPreview"
+class="preview"
+hidden>
+
+<span>
+Donation
+</span>
+
+<strong id="amountPreviewValue">
+৳0
+</strong>
+
+</div>
+
+
+</div>
+
+
+
+
+<div class="divider"></div>
+
+
+
+
+<div class="form-grid">
+
+
+
+<div class="input-box full">
+
+<label>
+Full Name
+</label>
+
+<input
+id="fullName"
+name="fullName"
+type="text"
+placeholder="Your name">
+
+</div>
+
+
+
+
+<div class="input-box">
+
+<label>
+Email
+</label>
+
+<input
+id="email"
+name="email"
+type="email"
+placeholder="Email address">
+
+</div>
+
+
+
+
+
+<div class="input-box">
+
+<label>
+Phone Number
+</label>
+
+<input
+id="phone"
+name="phone"
+type="tel"
+placeholder="017XXXXXXXX">
+
+</div>
+
+
+
+
+
+<div class="input-box">
+
+<label>
+City
+</label>
+
+<input
+id="city"
+name="city"
+type="text"
+placeholder="Dhaka">
+
+</div>
+
+
+
+
+
+<div class="input-box">
+
+<label>
+Country
+</label>
+
+<input
+id="country"
+name="country"
+type="text"
+value="Bangladesh">
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+<p id="formStatus" class="status"></p>
+
+
+
+
+<button
+id="submitBtn"
+class="submit-btn"
+type="submit">
+
+
+<span class="submit-btn__label">
+Proceed to Payment
+</span>
+
+
+<span class="submit-btn__spinner"></span>
+
+
+</button>
+
+
+
+
+<div class="secure-note">
+
+🔒 Secure payment powered by Moneybag
+
+</div>
+
+
+
+
+</form>
+
+
+
+</div>
+
+
+
+</section>
+
 
 </main>
 
 
-<script src="script.js?v=10"></script>
+<script src="script.js"></script>
+
 
 </body>
+
 </html>
