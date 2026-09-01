@@ -39,15 +39,13 @@ async function createPayment(req, res) {
     }
 
     // 2. Re-validate donor details.
-    const donor = {
-      name: sanitizeText(name, 120),
-      email: sanitizeText(email, 254),
-      phone: sanitizeText(phone, 20),
-      address: sanitizeText(address, 255),
-      city: sanitizeText(city, 100),
-      postcode: sanitizeText(postcode, 20),
-      country: "Bangladesh",
-    };
+   const donor = {
+  name: sanitizeText(name, 120),
+  email: sanitizeText(email, 254),
+  phone: sanitizeText(phone, 20),
+  city: sanitizeText(city, 100),
+  country: sanitizeText(country || "Bangladesh", 100),
+};
     const donorCheck = validateDonor(donor);
     if (!donorCheck.valid) {
       return res.status(400).json({ success: false, errors: donorCheck.errors });
