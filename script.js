@@ -240,34 +240,38 @@ form.addEventListener("submit", async (event) => {
 
   setLoading(true);
 
-  try {
-    `${API_BASE_URL}/api/create-payment`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+  
+try {
+  const response = await fetch(`${API_BASE_URL}/api/create-payment`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
 
-    const data = await response.json();
+  const data = await response.json();
 
-    if (!response.ok || !data.success) {
-      const message =
-        data.error ||
-        (data.errors && Object.values(data.errors)[0]) ||
-        "Something went wrong starting your payment. Please try again.";
-      setFormStatus(message, "error");
-      setLoading(false);
-      return;
-    }
+  if (!response.ok || !data.success) {
+    const message =
+      data.error ||
+      (data.errors && Object.values(data.errors)[0]) ||
+      "Something went wrong starting your payment. Please try again.";
 
-    // Remember the order so the success/failed page can verify it, even
-    // though Moneybag's own redirect parameters are the primary signal.
-    sessionStorage.setItem("donation_order_id", data.orderId);
-
-    // Redirect to the EXACT checkout URL Moneybag returned — never
-    // constructed manually.
-    window.location.href = data.checkoutUrl;
-  } catch (error) {
-    setFormStatus("Network error. Please check your connection and try again.", "error");
+    setFormStatus(message, "error");
     setLoading(false);
+    return;
   }
+
+  sessionStorage.setItem("donation_order_id", data.orderId);
+
+  window.location.href = data.checkoutUrl;
+} catch (error) {
+  console.error("Payment request failed:", error);
+  setFormStatus(
+    "Network error. Please check your connection and try again.",
+    "error"
+  );
+  setLoading(false);
+}
 });
