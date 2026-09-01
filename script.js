@@ -1,277 +1,489 @@
-// script.js
-//
-// Handles the donation form: amount selection, client-side validation
-// (a convenience for the donor — the backend re-validates everything),
-// and submitting to OUR OWN backend, never to Moneybag directly.
+// ===============================
+// DONATION WEBSITE - script.js
+// ===============================
 
-// -----------------------------------------------------------------------
-// Configuration
-// -----------------------------------------------------------------------
-// Point this at your backend. In local development that's
-// http://localhost:5000; after deployment, change it to your deployed
-// backend's public HTTPS URL (see README "Deployment").
 const API_BASE_URL = "https://donation-website-7qgp.onrender.com";
 
-const MIN_AMOUNT = 10;
-const MAX_AMOUNT = 1000000;
-const BD_PHONE_REGEX = /^(?:\+?88)?01[3-9]\d{8}$/;
-
-// -----------------------------------------------------------------------
-// Elements
-// -----------------------------------------------------------------------
 const form = document.getElementById("donationForm");
-const amountGrid = document.getElementById("amountGrid");
-const amountButtons = Array.from(amountGrid.querySelectorAll(".amount-btn"));
-const customAmountWrap = document.getElementById("customAmountWrap");
-const customAmountInput = document.getElementById("customAmount");
-const amountError = document.getElementById("amountError");
+
+const amountButtons = document.querySelectorAll(".amount-btn");
 const amountPreview = document.getElementById("amountPreview");
 const amountPreviewValue = document.getElementById("amountPreviewValue");
-const formStatus = document.getElementById("formStatus");
+
+const customAmountWrap = document.getElementById("customAmountWrap");
+const customAmountInput = document.getElementById("customAmount");
+
+const amountError = document.getElementById("amountError");
+
 const submitBtn = document.getElementById("submitBtn");
+const formStatus = document.getElementById("formStatus");
 
-let selectedAmountOption = null; // "10" | "20" | "50" | "custom"
-let currentAmount = null; // resolved numeric amount
+let currentAmount = 0;
+let selectedAmountType = null;
 
-// -----------------------------------------------------------------------
-// Amount selection
-// -----------------------------------------------------------------------
-amountButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    selectAmountOption(btn.dataset.amount);
+
+// ===============================
+// SELECT AMOUNT
+// ===============================
+
+amountButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    clearAmountError();
+
+    amountButtons.forEach((btn) => {
+      btn.classList.remove("is-selected");
+      btn.setAttribute("aria-checked", "false");
+    });
+
+    button.classList.add("is-selected");
+    button.setAttribute("aria-checked", "true");
+
+    const amountValue = button.dataset.amount;
+
+    if (amountValue === "custom") {
+      selectedAmountType = "custom";
+
+      currentAmount = 0;
+
+      customAmountWrap.hidden = false;
+      amountPreview.hidden = true;
+
+      customAmountInput.focus();
+
+      return;
+    }
+
+    selectedAmountType = "preset";
+
+    customAmountWrap.hidden = true;
+
+    customAmountInput.value = "";
+
+    currentAmount = Number(amountValue);
+
+    updateAmountPreview();
   });
 });
 
-function selectAmountOption(option) {
-  selectedAmountOption = option;
 
-  amountButtons.forEach((btn) => {
-    const isSelected = btn.dataset.amount === option;
-    btn.classList.toggle("is-selected", isSelected);
-    btn.setAttribute("aria-checked", String(isSelected));
-  });
-
-  if (option === "custom") {
-    customAmountWrap.hidden = false;
-    customAmountInput.focus();
-    currentAmount = parseAmount(customAmountInput.value);
-  } else {
-    customAmountWrap.hidden = true;
-    currentAmount = Number(option);
-  }
-
-  hideAmountError();
-  updateAmountPreview();
-}
+// ===============================
+// CUSTOM AMOUNT
+// ===============================
 
 customAmountInput.addEventListener("input", () => {
-  currentAmount = parseAmount(customAmountInput.value);
-  hideAmountError();
+  clearAmountError();
+
+  const value = Number(customAmountInput.value);
+
+  if (!value || value <= 0) {
+    currentAmount = 0;
+    amountPreview.hidden = true;
+    return;
+  }
+
+  currentAmount = value;
+
   updateAmountPreview();
 });
 
-function parseAmount(rawValue) {
-  if (rawValue === "" || rawValue === null || rawValue === undefined) return null;
-  const num = Number(rawValue);
-  return Number.isFinite(num) ? num : null;
-}
+
+// ===============================
+// AMOUNT PREVIEW
+// ===============================
 
 function updateAmountPreview() {
-  if (currentAmount && currentAmount > 0) {
-    amountPreview.hidden = false;
-    amountPreviewValue.textContent = `৳${formatAmount(currentAmount)}`;
-  } else {
+  if (!currentAmount || currentAmount <= 0) {
     amountPreview.hidden = true;
+    return;
+  }
+
+  amountPreviewValue.textContent = `৳${formatAmount(currentAmount)}`;
+
+  amountPreview.hidden = false;
+}
+
+
+function formatAmount(amount) {
+  return new Intl.NumberFormat("en-BD", {
+    maximumFractionDigits: 2,
+  }).format(amount);
+}
+
+
+// ===============================
+// FIELD HELPERS
+// ===============================
+
+function getField(id) {
+  return document.getElementById(id);
+}
+
+
+function getErrorElement(fieldName) {
+  return document.querySelector(
+    `[data-error-for="${fieldName}"]`
+  );
+}
+
+
+function setFieldError(fieldName, message) {
+  const field = getField(fieldName);
+  const error = getErrorElement(fieldName);
+
+  if (field) {
+    field.setAttribute("aria-invalid", "true");
+  }
+
+  if (error) {
+    error.textContent = message;
+    error.hidden = false;
   }
 }
 
-function formatAmount(amount) {
-  return Number(amount).toLocaleString("en-US", {
-    maximumFractionDigits: 2,
-  });
+
+function clearFieldError(fieldName) {
+  const field = getField(fieldName);
+  const error = getErrorElement(fieldName);
+
+  if (field) {
+    field.removeAttribute("aria-invalid");
+  }
+
+  if (error) {
+    error.textContent = "";
+    error.hidden = true;
+  }
 }
 
-function showAmountError(message) {
+
+function clearAllFieldErrors() {
+  [
+    "fullName",
+    "email",
+    "phone",
+    "city",
+  ].forEach(clearFieldError);
+}
+
+
+// ===============================
+// AMOUNT ERROR
+// ===============================
+
+function setAmountError(message) {
   amountError.textContent = message;
   amountError.hidden = false;
 }
 
-function hideAmountError() {
-  amountError.hidden = true;
+
+function clearAmountError() {
   amountError.textContent = "";
+  amountError.hidden = true;
 }
 
-function validateAmountSelection() {
-  if (!selectedAmountOption) {
-    showAmountError("Please choose a donation amount.");
-    return false;
+
+// ===============================
+// VALIDATION
+// ===============================
+
+function validateForm() {
+  let isValid = true;
+
+  clearAllFieldErrors();
+  clearAmountError();
+  clearFormStatus();
+
+  // Amount
+  if (!currentAmount || currentAmount < 10) {
+    setAmountError(
+      "Please select a donation amount of at least ৳10."
+    );
+
+    isValid = false;
   }
 
-  if (currentAmount === null || Number.isNaN(currentAmount)) {
-    showAmountError("Please enter a valid amount.");
-    return false;
+  // Full name
+  const fullName = getField("fullName").value.trim();
+
+  if (!fullName) {
+    setFieldError(
+      "fullName",
+      "Please enter your full name."
+    );
+
+    isValid = false;
+  } else if (fullName.length < 2) {
+    setFieldError(
+      "fullName",
+      "Please enter a valid name."
+    );
+
+    isValid = false;
   }
 
-  if (currentAmount <= 0) {
-    showAmountError("Donation amount must be greater than zero.");
-    return false;
+  // Email
+  const email = getField("email").value.trim();
+
+  const emailPattern =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!email) {
+    setFieldError(
+      "email",
+      "Please enter your email."
+    );
+
+    isValid = false;
+  } else if (!emailPattern.test(email)) {
+    setFieldError(
+      "email",
+      "Please enter a valid email address."
+    );
+
+    isValid = false;
   }
 
-  if (currentAmount < MIN_AMOUNT) {
-    showAmountError(`Minimum donation amount is ৳${MIN_AMOUNT}.`);
-    return false;
+  // Phone
+  const phone = getField("phone").value.trim();
+
+  const cleanedPhone =
+    phone.replace(/[\s\-()+]/g, "");
+
+  const bangladeshPhonePattern =
+    /^(?:88)?01[3-9]\d{8}$/;
+
+  if (!phone) {
+    setFieldError(
+      "phone",
+      "Please enter your phone number."
+    );
+
+    isValid = false;
+  } else if (
+    !bangladeshPhonePattern.test(cleanedPhone)
+  ) {
+    setFieldError(
+      "phone",
+      "Enter a valid Bangladesh mobile number."
+    );
+
+    isValid = false;
   }
 
-  if (currentAmount > MAX_AMOUNT) {
-    showAmountError(`Maximum donation amount is ৳${formatAmount(MAX_AMOUNT)}.`);
-    return false;
+  // City
+  const city = getField("city").value.trim();
+
+  if (!city) {
+    setFieldError(
+      "city",
+      "Please enter your city."
+    );
+
+    isValid = false;
   }
 
-  hideAmountError();
-  return true;
+  return isValid;
 }
 
-// -----------------------------------------------------------------------
-// Donor field validation
-// -----------------------------------------------------------------------
-const fieldValidators = {
-  fullName: (value) => (value.trim().length > 0 ? null : "Full name is required."),
-  email: (value) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()) ? null : "Enter a valid email address.",
-  phone: (value) =>
-    BD_PHONE_REGEX.test(value.trim())
-      ? null
-      : "Enter a valid Bangladeshi number, e.g. 017XXXXXXXX or +88017XXXXXXXX.",
-  address: (value) => (value.trim().length > 0 ? null : "Address is required."),
-  city: (value) => (value.trim().length > 0 ? null : "City is required."),
-  postcode: (value) => (value.trim().length > 0 ? null : "Postcode is required."),
-};
 
-function validateDonorFields() {
-  let allValid = true;
+// ===============================
+// REMOVE ERROR WHILE TYPING
+// ===============================
 
-  Object.keys(fieldValidators).forEach((fieldName) => {
-    const input = document.getElementById(fieldName);
-    const errorEl = form.querySelector(`[data-error-for="${fieldName}"]`);
-    const message = fieldValidators[fieldName](input.value);
+[
+  "fullName",
+  "email",
+  "phone",
+  "city",
+].forEach((fieldName) => {
+  const field = getField(fieldName);
 
-    if (message) {
-      allValid = false;
-      input.setAttribute("aria-invalid", "true");
-      if (errorEl) {
-        errorEl.textContent = message;
-        errorEl.hidden = false;
-      }
-    } else {
-      input.removeAttribute("aria-invalid");
-      if (errorEl) {
-        errorEl.hidden = true;
-        errorEl.textContent = "";
-      }
-    }
-  });
-
-  return allValid;
-}
-
-// Clear a field's error as soon as the donor starts fixing it
-Object.keys(fieldValidators).forEach((fieldName) => {
-  const input = document.getElementById(fieldName);
-  input.addEventListener("input", () => {
-    const message = fieldValidators[fieldName](input.value);
-    const errorEl = form.querySelector(`[data-error-for="${fieldName}"]`);
-    if (!message) {
-      input.removeAttribute("aria-invalid");
-      if (errorEl) errorEl.hidden = true;
-    }
+  field.addEventListener("input", () => {
+    clearFieldError(fieldName);
+    clearFormStatus();
   });
 });
 
-// -----------------------------------------------------------------------
-// Form status helper
-// -----------------------------------------------------------------------
-function setFormStatus(message, tone) {
-  if (!message) {
-    formStatus.hidden = true;
-    formStatus.removeAttribute("data-tone");
-    return;
-  }
+
+// ===============================
+// FORM STATUS
+// ===============================
+
+function showFormStatus(message, type = "error") {
   formStatus.textContent = message;
-  formStatus.dataset.tone = tone || "info";
+
+  formStatus.dataset.tone = type;
+
   formStatus.hidden = false;
 }
 
-function setLoading(isLoading) {
-  submitBtn.disabled = isLoading;
-  submitBtn.classList.toggle("is-loading", isLoading);
-  submitBtn.querySelector(".submit-btn__label").textContent = isLoading
-    ? "Preparing secure payment…"
-    : "Proceed to Payment";
+
+function clearFormStatus() {
+  formStatus.textContent = "";
+
+  formStatus.removeAttribute("data-tone");
+
+  formStatus.hidden = true;
 }
 
-// -----------------------------------------------------------------------
-// Submission
-// -----------------------------------------------------------------------
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  setFormStatus(null);
 
-  const amountValid = validateAmountSelection();
-  const donorValid = validateDonorFields();
+// ===============================
+// LOADING BUTTON
+// ===============================
 
-  if (!amountValid) {
-    amountGrid.scrollIntoView({ behavior: "smooth", block: "center" });
+function setLoading(isLoading) {
+  submitBtn.disabled = isLoading;
+
+  if (isLoading) {
+    submitBtn.classList.add("is-loading");
+
+    const label =
+      submitBtn.querySelector(
+        ".submit-btn__label"
+      );
+
+    if (label) {
+      label.textContent =
+        "Connecting to Moneybag...";
+    }
+
     return;
   }
-  if (!donorValid) {
-    setFormStatus("Please fix the highlighted fields before continuing.", "error");
+
+  submitBtn.classList.remove("is-loading");
+
+  const label =
+    submitBtn.querySelector(
+      ".submit-btn__label"
+    );
+
+  if (label) {
+    label.textContent =
+      "Proceed to Payment";
+  }
+}
+
+
+// ===============================
+// SUBMIT DONATION
+// ===============================
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  if (!validateForm()) {
+    showFormStatus(
+      "Please check the information above.",
+      "error"
+    );
+
     return;
   }
 
   const payload = {
-    amount: currentAmount,
-    name: document.getElementById("fullName").value.trim(),
-    email: document.getElementById("email").value.trim(),
-    phone: document.getElementById("phone").value.trim(),
-    address: document.getElementById("address").value.trim(),
-    city: document.getElementById("city").value.trim(),
-    postcode: document.getElementById("postcode").value.trim(),
+    amount: Number(currentAmount),
+
+    name:
+      getField("fullName").value.trim(),
+
+    email:
+      getField("email").value.trim(),
+
+    phone:
+      getField("phone").value.trim(),
+
+    city:
+      getField("city").value.trim(),
+
+    country:
+      getField("country").value.trim(),
   };
 
   setLoading(true);
+  clearFormStatus();
 
-  
-try {
-  const response = await fetch(`${API_BASE_URL}/api/create-payment`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/create-payment`,
+      {
+        method: "POST",
 
-  const data = await response.json();
+        headers: {
+          "Content-Type": "application/json",
+        },
 
-  if (!response.ok || !data.success) {
-    const message =
-      data.error ||
-      (data.errors && Object.values(data.errors)[0]) ||
-      "Something went wrong starting your payment. Please try again.";
+        body: JSON.stringify(payload),
+      }
+    );
 
-    setFormStatus(message, "error");
+
+    let data;
+
+    try {
+      data = await response.json();
+    } catch {
+      throw new Error(
+        "The server returned an invalid response."
+      );
+    }
+
+
+    if (!response.ok || !data.success) {
+      const errorMessage =
+        data?.error ||
+        "Unable to start payment. Please try again.";
+
+      showFormStatus(
+        errorMessage,
+        "error"
+      );
+
+      setLoading(false);
+
+      return;
+    }
+
+
+    if (!data.checkoutUrl) {
+      showFormStatus(
+        "Moneybag checkout URL was not received.",
+        "error"
+      );
+
+      setLoading(false);
+
+      return;
+    }
+
+
+    if (data.orderId) {
+      sessionStorage.setItem(
+        "donation_order_id",
+        data.orderId
+      );
+    }
+
+
+    showFormStatus(
+      "Redirecting to secure payment...",
+      "success"
+    );
+
+
+    window.location.href =
+      data.checkoutUrl;
+
+  } catch (error) {
+    console.error(
+      "Payment request error:",
+      error
+    );
+
+    showFormStatus(
+      "Could not connect to the payment server. Please try again.",
+      "error"
+    );
+
     setLoading(false);
-    return;
   }
-
-  sessionStorage.setItem("donation_order_id", data.orderId);
-
-  window.location.href = data.checkoutUrl;
-} catch (error) {
-  console.error("Payment request failed:", error);
-  setFormStatus(
-    "Network error. Please check your connection and try again.",
-    "error"
-  );
-  setLoading(false);
-}
 });
