@@ -1,112 +1,306 @@
-// success.js
-//
-// CRITICAL: arriving on this page does NOT mean the donation succeeded —
-// Moneybag redirects here based on client-side navigation, which anyone
-// could trigger manually. We only show a confirmed "Thank you" state after
-// our OWN backend has verified the transaction directly with Moneybag.
+const API_BASE_URL =
+  "https://donation-website-7qgp.onrender.com/api";
 
-const API_BASE_URL = "https://donation-website-7qgp.onrender.com/api"; // keep in sync with script.js
 
-const ICONS = {
-  success: `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  error: `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`,
-};
+const verificationBox =
+  document.querySelector(".verification-box");
 
-function getQueryParam(names) {
-  const params = new URLSearchParams(window.location.search);
+const verificationText =
+  document.getElementById("verificationText");
+
+const verificationDot =
+  document.getElementById("verificationDot");
+
+const loaderLine =
+  document.getElementById("loaderLine");
+
+const paymentStatus =
+  document.getElementById("paymentStatus");
+
+const paymentAmount =
+  document.getElementById("paymentAmount");
+
+const transactionIdElement =
+  document.getElementById("transactionId");
+
+const orderIdElement =
+  document.getElementById("orderId");
+
+
+function getUrlValue(names) {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
   for (const name of names) {
-    const value = params.get(name);
-    if (value) return value;
+
+    const value =
+      params.get(name);
+
+    if (value) {
+      return value;
+    }
+
   }
+
   return null;
 }
 
-async function verifyAndRender() {
-  const verifyingStatus = document.getElementById("verifyingStatus");
-  const resultContent = document.getElementById("resultContent");
-  const resultIcon = document.getElementById("resultIcon");
-  const resultTitle = document.getElementById("resultTitle");
-  const resultMessage = document.getElementById("resultMessage");
-  const resultDetails = document.getElementById("resultDetails");
-  const detailAmount = document.getElementById("detailAmount");
-  const detailTransactionId = document.getElementById("detailTransactionId");
-  const detailStatus = document.getElementById("detailStatus");
 
-  function showResult({ ok, title, message, details }) {
-    verifyingStatus.hidden = true;
-    resultIcon.className = `result-icon ${ok ? "result-icon--success" : "result-icon--error"}`;
-    resultIcon.innerHTML = ok ? ICONS.success : ICONS.error;
-    resultTitle.textContent = title;
-    resultMessage.textContent = message;
+const transactionId =
+  getUrlValue([
+    "transaction_id",
+    "transactionId",
+    "txn_id",
+    "trx_id"
+  ]);
 
-    if (details) {
-      detailAmount.textContent = `৳${details.amount}`;
-      detailTransactionId.textContent = details.transactionId || "—";
-      detailStatus.textContent = details.status || (ok ? "Confirmed" : "Not confirmed");
-      resultDetails.classList.add("is-visible");
-    }
 
-    resultContent.hidden = false;
-    document.title = title;
+const urlOrderId =
+  getUrlValue([
+    "order_id",
+    "orderId"
+  ]);
+
+
+const storedOrderId =
+  sessionStorage.getItem(
+    "donation_order_id"
+  );
+
+
+const orderId =
+  urlOrderId ||
+  storedOrderId ||
+  null;
+
+
+/* SHOW BASIC IDs */
+
+transactionIdElement.textContent =
+  transactionId || "Not available";
+
+orderIdElement.textContent =
+  orderId || "Not available";
+
+
+/* FORMAT AMOUNT */
+
+function formatAmount(value) {
+
+  const number =
+    Number(value);
+
+  if (!Number.isFinite(number)) {
+    return "—";
   }
 
-  // Moneybag's exact redirect query parameter names for the success_url
-  // aren't published in the public docs we could confirm at build time.
-  // We check the common possibilities here — if your sandbox redirects
-  // use a different parameter name, add it to this list.
-  const transactionId = getQueryParam(["transaction_id", "transactionId", "txn_id"]);
-  const orderIdFromUrl = getQueryParam(["order_id", "orderId"]);
-  const orderIdFromSession = sessionStorage.getItem("donation_order_id");
-  const orderId = orderIdFromUrl || orderIdFromSession;
+  return `৳${new Intl.NumberFormat(
+    "en-BD",
+    {
+      maximumFractionDigits: 2
+    }
+  ).format(number)}`;
+}
+
+
+/* VERIFIED UI */
+
+function showVerified(data) {
+
+  verificationBox.classList.remove(
+    "failed"
+  );
+
+  verificationBox.classList.add(
+    "verified"
+  );
+
+
+  verificationText.textContent =
+    "Payment verified successfully";
+
+
+  paymentStatus.textContent =
+    "Verified";
+
+
+  loaderLine.hidden =
+    true;
+
+
+  const amount =
+    data?.amount ??
+    data?.orderAmount ??
+    data?.payment?.amount ??
+    data?.payment?.orderAmount;
+
+
+  if (amount !== undefined) {
+
+    paymentAmount.textContent =
+      formatAmount(amount);
+
+  }
+
+
+  const returnedTransactionId =
+    data?.transactionId ??
+    data?.transaction_id ??
+    data?.payment?.transactionId ??
+    data?.payment?.transaction_id;
+
+
+  if (returnedTransactionId) {
+
+    transactionIdElement.textContent =
+      returnedTransactionId;
+
+  }
+
+
+  const returnedOrderId =
+    data?.orderId ??
+    data?.order_id ??
+    data?.payment?.orderId ??
+    data?.payment?.order_id;
+
+
+  if (returnedOrderId) {
+
+    orderIdElement.textContent =
+      returnedOrderId;
+
+  }
+
+}
+
+
+/* FAILED UI */
+
+function showVerificationError(message) {
+
+  verificationBox.classList.remove(
+    "verified"
+  );
+
+  verificationBox.classList.add(
+    "failed"
+  );
+
+
+  verificationText.textContent =
+    message;
+
+
+  paymentStatus.textContent =
+    "Unable to verify";
+
+
+  loaderLine.hidden =
+    true;
+}
+
+
+/* VERIFY PAYMENT */
+
+async function verifyPayment() {
 
   if (!transactionId) {
-    showResult({
-      ok: false,
-      title: "We couldn't confirm this payment",
-      message:
-        "No transaction reference was found in the returning link. If money was deducted, please contact support with your order details before donating again.",
-    });
+
+    showVerificationError(
+      "Transaction ID was not received."
+    );
+
     return;
   }
 
+
   try {
-    const url = new URL(`${API_BASE_URL}/payment/verify/${encodeURIComponent(transactionId)}`);
-    if (orderId) url.searchParams.set("orderId", orderId);
 
-    const response = await fetch(url.toString());
-    const data = await response.json();
+    const url =
+      `${API_BASE_URL}/payment/verify/` +
+      encodeURIComponent(
+        transactionId
+      );
 
-    if (response.ok && data.success && data.verified) {
-      showResult({
-        ok: true,
-        title: "Thank you for your donation!",
-        message: "Your payment has been verified and confirmed by Moneybag.",
-        details: {
-          amount: data.amount,
-          transactionId: data.transactionId,
-          status: data.status,
-        },
-      });
-      sessionStorage.removeItem("donation_order_id");
-    } else {
-      showResult({
-        ok: false,
-        title: "Payment not confirmed",
-        message:
-          data.error ||
-          "We could not verify this payment as successful. If you believe this is an error, please contact support with your transaction ID.",
-        details: data.transactionId
-          ? { amount: data.amount, transactionId: data.transactionId, status: data.status }
-          : null,
-      });
+
+    const response =
+      await fetch(url);
+
+
+    let data;
+
+
+    try {
+
+      data =
+        await response.json();
+
+    } catch {
+
+      throw new Error(
+        "The verification server returned an invalid response."
+      );
+
     }
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        data?.error ||
+        data?.message ||
+        "Payment verification failed."
+      );
+
+    }
+
+
+    if (
+      data?.success === false
+    ) {
+
+      throw new Error(
+        data?.error ||
+        data?.message ||
+        "Payment could not be verified."
+      );
+
+    }
+
+
+    showVerified(data);
+
+
+    /*
+      Clear stored order ID after
+      successful verification.
+    */
+
+    sessionStorage.removeItem(
+      "donation_order_id"
+    );
+
+
   } catch (error) {
-    showResult({
-      ok: false,
-      title: "Verification error",
-      message: "We couldn't reach the server to verify your payment. Please contact support if money was deducted.",
-    });
+
+    console.error(
+      "Verification error:",
+      error
+    );
+
+
+    showVerificationError(
+      error.message ||
+      "We couldn't verify your payment."
+    );
+
   }
+
 }
 
-verifyAndRender();
+
+verifyPayment();
