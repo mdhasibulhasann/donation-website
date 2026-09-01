@@ -5,7 +5,7 @@
 // could trigger manually. We only show a confirmed "Thank you" state after
 // our OWN backend has verified the transaction directly with Moneybag.
 
-const API_BASE_URL = "http://localhost:5000/api"; // keep in sync with script.js
+const API_BASE_URL = "https://donation-website-7qgp.onrender.com/api"; // keep in sync with script.js
 
 const ICONS = {
   success: `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
