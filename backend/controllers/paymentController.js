@@ -22,7 +22,14 @@ const BACKEND_PUBLIC_URL = process.env.BACKEND_PUBLIC_URL;
  */
 async function createPayment(req, res) {
   try {
-    const { amount, name, email, phone, address, city, postcode } = req.body || {};
+    const {
+  amount,
+  name,
+  email,
+  phone,
+  city,
+  country,
+} = req.body || {};
 
     // 1. Re-validate the amount. NEVER trust the amount just because the
     //    frontend sent it — a malicious client could send any number.
